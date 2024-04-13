@@ -52,6 +52,7 @@ def login_info():
 @app.route("/logout")
 def logout():
     session.pop("username", None)
+    session.pop("password", None)
     return redirect(url_for("index"))
     
 
@@ -76,13 +77,38 @@ def process():
 def mood():
     return render_template("mood.html")
 
+@app.route("/mood_track")
+def mood_track():
+    return render_template("track.html")
+
+
+@app.route("/process_track", methods = ["POST"])
+def track():
+    if request.method == "POST":
+        date = request.form.get("date")
+        mood = request.form.get("mood")
+        note = request.form.get("note")
+        username = session["username"]
+        
+        cursor = mysql.connection.cursor()
+        query = ""
+
+        cursor.execute(query,(username,date,))
+        result = cursor.fetchall()
+        cursor.close()
+
+        return str(result[0][0])
+
 @app.route("/about")
 def about():
     return render_template("about.html")
 
 @app.route("/calendar")
 def calendar():
-    return render_template("calendar.html")
+    if session.get("username") is None:
+        return render_template("login.html")
+    else:
+        return render_template("calendar.html")
     
 
 
