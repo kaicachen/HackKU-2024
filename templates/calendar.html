@@ -102,46 +102,6 @@
   <!-- end calendar header section -->
 
   <!-- calendar section -->
-  <!-- <div id="calendar-body">
-    <div>Sun</div>
-    <div>Mon</div>
-    <div>Tue</div>
-    <div>Wed</div>
-    <div>Thu</div>
-    <div>Fri</div>
-    <div>Sat</div> -->
-    <!-- Days of the month will go here -->
-    <!--<div><a href="{{ url_for('add_mood', day=1) }}"><div>1</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=2) }}"><div>2</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=3) }}"><div>3</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=4) }}"><div>4</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=5) }}"><div>5</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=6) }}"><div>6</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=7) }}"><div>7</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=8) }}"><div>8</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=9) }}"><div>9</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=10) }}"><div>10</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=11) }}"><div>11</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=12) }}"><div>12</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=13) }}"><div>13</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=14) }}"><div>14</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=15) }}"><div>15</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=16) }}"><div>16</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=17) }}"><div>17</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=18) }}"><div>18</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=19) }}"><div>19</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=20) }}"><div>20</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=21) }}"><div>21</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=22) }}"><div>22</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=23) }}"><div>23</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=24) }}"><div>24</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=25) }}"><div>25</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=26) }}"><div>26</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=27) }}"><div>27</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=28) }}"><div>28</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=29) }}"><div>29</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=30) }}"><div>30</div></a></div>
-    <div><a href="{{ url_for('add_mood', day=31) }}"><div>31</div></a></div>-->
 </div>
 </div>
 <!-- calendar JS section -->
@@ -213,17 +173,30 @@ function renderCalendar() {
     }
 
     for (let i = 1; i <= lastDay; i++) {
-        if (
-            i === new Date().getDate() &&
-            date.getMonth() === new Date().getMonth() &&
-            date.getFullYear() === new Date().getFullYear()
-        ) {
-            dates += `<div class='today'>${i}</div>`;
-        } else {
-            dates += `<div>${i}</div>`;
-        }
+    const fullDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+    if (
+        i === new Date().getDate() &&
+        date.getMonth() === new Date().getMonth() &&
+        date.getFullYear() === new Date().getFullYear()
+    ) {
+        dates += `<div><form action="/process_form" method="post"><button type="submit" name="date" value="${fullDate}">${i}</button></form></div>`;
+    } else {
+        dates += `<div><form action="/process_form" method="post"><button type="submit" name="date" value="${fullDate}">${i}</button></form></div>`;
     }
+    // console.log(fullDate);
+}
 
+//<form action="/login_info" method = "post">
+    //<label for="username">Username:</label><br>
+    //<input type="text" id="username" name="username"><br>
+    
+    //<label for="lname">Password:</label><br>
+    //<input type="text" id="password" name="password"><br><br>
+    
+    //<input type="submit" value="Submit">
+  //</form>
+
+    
     for (let j = 1; j <= nextDays; j++) {
         dates += `<div class='next-date'>${j}</div>`;
         monthDays.innerHTML = dates;
