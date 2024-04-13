@@ -62,18 +62,24 @@ def mood_track():
 @app.route("/process_form", methods = ["POST"])
 def process():
     if request.method == "POST":
-        username = request.form.get("username")
+        username = session["username"]
         date = request.form.get("date")
-
+        results = []
         cursor = mysql.connection.cursor()
-        query = "SELECT note FROM logs WHERE username = %s AND date = %s"
+        query1 = "SELECT score FROM logs WHERE username = %s AND date = %s"
+        query2 = "SELECT note FROM logs WHERE username = %s AND date = %s"
+        cursor.execute(query1,(username,date,))
+        result1 = cursor.fetchone()
 
-        cursor.execute(query,(username,date,))
-        result = cursor.fetchall()
+        cursor.execute(query2,(username,date,))
+        result2 = cursor.fetchone()
+
+        results.append(result1)
+        results.append(result2)
+
         cursor.close()
 
-        return str(result[0][0])
-
+        return [element for element in results]
 
 @app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
 def add_mood(day):
