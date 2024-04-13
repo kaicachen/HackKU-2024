@@ -13,6 +13,8 @@ app.config['MYSQL_DB'] = 'mental_health'
 mysql = MySQL(app)
 
 
+
+
 @app.route("/")
 def hello_world():
     return render_template('frontpage.html')
@@ -21,8 +23,14 @@ def hello_world():
 def process():
     if request.method == "POST":
         name = request.form.get("name")
+        cursor = mysql.connection.cursor()
+        query = "SELECT * FROM users WHERE username = %s"
 
-        return "Your name is: " + name
+        cursor.execute(query, (name,))
+        result = cursor.fetchall()
+        cursor.close()
+
+        return str(result)
 
 
 @app.route("/mood")
