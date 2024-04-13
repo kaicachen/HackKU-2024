@@ -1,7 +1,15 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mysqldb import MySQL
 
-app = Flask(__name__, template_folder="templates", static_folder="static")
+app = Flask(__name__)
+app.secret_key = "hello"
+
+app.config['SESSION_COOKIE_NAME'] = 'session'  # Name of the session cookie
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Limit cookie access to HTTP requests
+app.config['SESSION_COOKIE_SECURE'] = True  # Only send cookie over HTTPS
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # SameSite policy for cookies
+
+
 
 
 app.config['MYSQL_HOST'] = 'localhost'
@@ -13,18 +21,43 @@ mysql = MySQL(app)
 
 
 
-
 @app.route("/")
 def hello_world():
     return render_template('index.html')
 
-@app.route("/index", methods = ["GET", "POST"])
+@app.route("/index")
 def index():
     return render_template('index.html')
 
-@app.route("/login")
+@app.route("/login", methods = ["GET","POST"])
 def login():
-    return render_template('login.html')
+    if session.get("username") is None:
+        return render_template("login.html")
+        
+    else:
+        return render_template("login_success.html")
+
+@app.route("/login_info", methods = ["GET","POST"])
+def login_info():
+
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        session["username"] = username
+        session["password"] = password
+        return redirect(url_for("login"))   
+
+    return render_template("login_success.html")
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    session.pop("password", None)
+    return redirect(url_for("index"))
+    
+@app.route("/mood_track")
+def mood_track():
+    return redirect(url_for("track.html"))
 
 @app.route("/process_form", methods = ["POST"])
 def process():
@@ -41,11 +74,13 @@ def process():
 
         return str(result[0][0])
 
+
 @app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
 def add_mood(day):
     if request.method == 'POST':
         # Get mood data from the form and insert into the database
-        mood = request.form['mood']
+        username = request.form.get["username"]
+
         # Insert mood data into MySQL database
         # Your MySQL insertion code here...
 
@@ -57,15 +92,15 @@ def add_mood(day):
 
 @app.route("/mood")
 def mood():
-    return render_template('mood.html')
-
-@app.route("/calendar")
-def calendar():
-    return render_template('calendar.html')
+    return render_template("mood.html")
 
 @app.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template("about.html")
+
+@app.route("/calendar")
+def calendar():
+    return render_template("calendar.html")
     
 
 
