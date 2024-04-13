@@ -78,17 +78,20 @@ def process():
         results.append(result1)
         results.append(result2)
         cursor.close()
-        
+        output = " | ".join(str(element) for sublist in results for element in sublist)
+
+        string_date = str(date)
+
         if date == today:
             if results == ["NULL", "NULL"]:
                 return redirect(url_for("track.html"))
             else:
-                return [element for element in results]
+                return f'<p>{string_date}: {output}</p>'
         else:
             if results == ["NULL", "NULL"]:
                 print("No entry for selected date")
             else:
-                return [element for element in results]
+                return f'<p>{string_date}: {output}</p>'
 
 @app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
 def add_mood(day):
