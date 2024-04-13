@@ -16,7 +16,7 @@ mysql = MySQL(app)
 
 @app.route("/")
 def hello_world():
-    return render_template('frontpage.html')
+    return render_template('index.html')
 
 @app.route("/process_form", methods = ["POST"])
 def process():
