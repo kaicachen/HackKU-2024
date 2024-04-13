@@ -89,25 +89,27 @@
   <section class="calendar">
     <div id="calendar">
         <div id="calendar-header">
-            <span id="month-prev" class="change-month"><</span>
+            <span id="month-prev" class="change-month">&lt;</span>
             <h1 id="month"></h1>
-            <span id="month-next" class="change-month">></span>
+            <span id="month-next" class="change-month">&gt;</span>
         </div>
+        <div id="days"></div>
+
         <div id="calendar-body"></div>
     </div>
-    <script src="calendar.js"></script>
+
   </section>
   <!-- end calendar header section -->
 
   <!-- calendar section -->
-  <div id="calendar-body">
+  <!-- <div id="calendar-body">
     <div>Sun</div>
     <div>Mon</div>
     <div>Tue</div>
     <div>Wed</div>
     <div>Thu</div>
     <div>Fri</div>
-    <div>Sat</div>
+    <div>Sat</div> -->
     <!-- Days of the month will go here -->
     <!--<div><a href="{{ url_for('add_mood', day=1) }}"><div>1</div></a></div>
     <div><a href="{{ url_for('add_mood', day=2) }}"><div>2</div></a></div>
@@ -151,7 +153,7 @@ function renderCalendar() {
 
     const monthDays = document.getElementById('calendar-body');
     const month = document.getElementById('month');
-    // const daysElement = document.getElementById('days');
+     const daysElement = document.getElementById('days');
 
     const lastDay = new Date(
         date.getFullYear(),
@@ -189,28 +191,42 @@ function renderCalendar() {
         'November',
         'December'
     ];
+
+    const days = [
+        'S',
+        'M',
+        'T',
+        'W',
+        'T',
+        'F',
+        'S'
+    ];
     
     month.innerText = `${months[date.getMonth()]} ${date.getFullYear()}`;
-    let days = '';
+
+    daysElement.innerHTML = days.map(day => `<div>${day}</div>`).join('');
+
+    let dates = '';
 
     for (let x = firstDayIndex; x > 0; x--) {
-        days += `<div class='prev-date'>${prevLastDay - x + 1}</div>`;
+        dates += `<div class='prev-date'>${prevLastDay - x + 1}</div>`;
     }
 
     for (let i = 1; i <= lastDay; i++) {
         if (
             i === new Date().getDate() &&
-            date.getMonth() === new Date().getMonth()
+            date.getMonth() === new Date().getMonth() &&
+            date.getFullYear() === new Date().getFullYear()
         ) {
-            days += `<div class='today'>${i}</div>`;
+            dates += `<div class='today'>${i}</div>`;
         } else {
-            days += `<div>${i}</div>`;
+            dates += `<div>${i}</div>`;
         }
     }
 
     for (let j = 1; j <= nextDays; j++) {
-        days += `<div class='next-date'>${j}</div>`;
-        monthDays.innerHTML = days;
+        dates += `<div class='next-date'>${j}</div>`;
+        monthDays.innerHTML = dates;
     }
 }
 
