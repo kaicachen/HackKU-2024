@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request
 from flask_mysqldb import MySQL
 
-
 app = Flask(__name__)
 
 
@@ -22,15 +21,17 @@ def hello_world():
 @app.route("/process_form", methods = ["POST"])
 def process():
     if request.method == "POST":
-        name = request.form.get("name")
-        cursor = mysql.connection.cursor()
-        query = "SELECT * FROM users WHERE username = %s"
+        username = request.form.get("username")
+        date = request.form.get("date")
 
-        cursor.execute(query, (name,))
+        cursor = mysql.connection.cursor()
+        query = "SELECT note FROM logs WHERE username = %s AND date = %s"
+
+        cursor.execute(query,(username,date,))
         result = cursor.fetchall()
         cursor.close()
 
-        return str(result)
+        return str(result[0][0])
 
 
 @app.route("/mood")
