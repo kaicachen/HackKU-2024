@@ -38,6 +38,11 @@ body {
   background-color: #fff;
   text-align: center;
 }
+
+#calendar-body div.today {
+  background-color: #f00;
+  color: #fff;
+}
 .change-month {
   cursor: pointer;
 }
