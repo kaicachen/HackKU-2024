@@ -179,7 +179,7 @@ function renderCalendar() {
         date.getMonth() === new Date().getMonth() &&
         date.getFullYear() === new Date().getFullYear()
     ) {
-        dates += `<div><form action="/process_form" method="post"><button type="submit" name="date" value="${fullDate}">${i}</button></form></div>`;
+        dates += `<div class='today'> <form action="/process_form" method="post"><button type="submit" name="date" value="${fullDate}">${i}</button></form></div>`;
     } else {
         dates += `<div><form action="/process_form" method="post"><button type="submit" name="date" value="${fullDate}">${i}</button></form></div>`;
     }

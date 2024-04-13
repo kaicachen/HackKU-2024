@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_mysqldb import MySQL
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = "hello"
+today = date.today()
 
 app.config['SESSION_COOKIE_NAME'] = 'session'  # Name of the session cookie
 app.config['SESSION_COOKIE_HTTPONLY'] = True  # Limit cookie access to HTTP requests
@@ -14,7 +16,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # SameSite policy for cookies
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'TN9VVQ%YPHu45YLftak$'
+app.config['MYSQL_PASSWORD'] = 'Terabyter47m!'
 app.config['MYSQL_DB'] = 'mental_health'
 
 mysql = MySQL(app)
@@ -70,16 +72,23 @@ def process():
         query2 = "SELECT note FROM logs WHERE username = %s AND date = %s"
         cursor.execute(query1,(username,date,))
         result1 = cursor.fetchone()
-
         cursor.execute(query2,(username,date,))
         result2 = cursor.fetchone()
 
         results.append(result1)
         results.append(result2)
-
         cursor.close()
-
-        return [element for element in results]
+        
+        if date == today:
+            if results == ["NULL", "NULL"]:
+                return redirect(url_for("track.html"))
+            else:
+                return [element for element in results]
+        else:
+            if results == ["NULL", "NULL"]:
+                print("No entry for selected date")
+            else:
+                return [element for element in results]
 
 @app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
 def add_mood(day):
