@@ -89,7 +89,7 @@ def track():
         mood = request.form.get("mood")
         note = request.form.get("note")
         username = session["username"]
-        
+
         cursor = mysql.connection.cursor()
         query = ""
 
@@ -110,7 +110,9 @@ def calendar():
     else:
         return render_template("calendar.html")
     
-
+@app.route("/resources")
+def resources():
+    return render_template("resources.html")
 
 if __name__ == '__main__':
     app.run()
