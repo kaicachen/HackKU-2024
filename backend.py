@@ -16,7 +16,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # SameSite policy for cookies
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Terabyter47m!'
+app.config['MYSQL_PASSWORD'] = 'TN9VVQ%YPHu45YLftak$'
 app.config['MYSQL_DB'] = 'mental_health'
 
 mysql = MySQL(app)
@@ -31,6 +31,38 @@ def hello_world():
 def index():
     return render_template('index.html')
 
+@app.route("/create_account")
+def create_account():
+    return render_template("createaccount.html")
+    
+
+@app.route("/account_success", methods = ["POST"])
+def account_success():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    firstname = request.form.get("firstname")
+    lastname = request.form.get("lastname")
+    location = request.form.get("location")
+
+    session["username"] = username
+    session["password"] = password
+    session["firstname"] = firstname
+    session["lastname"] = lastname
+    session["location"] = location
+
+    cursor = mysql.connection.cursor()
+
+    
+
+    query= "INSERT INTO users (username, passwd, firstname, lastname, location) VALUES (%s, %s, %s, %s, %s)"
+    cursor.execute(query,(username,password,firstname,lastname,location,))
+    mysql.connection.commit()
+    
+    cursor.close()
+
+    return render_template("account_success.html")
+
+
 @app.route("/login", methods = ["GET","POST"])
 def login():
     if session.get("username") is None:
@@ -43,13 +75,24 @@ def login():
 def login_info():
 
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        session["username"] = username
-        session["password"] = password
-        return redirect(url_for("login"))   
+        username = request.form.get("username")
+        password = request.form.get("password")
 
-    return render_template("login_success.html")
+        cursor = mysql.connection.cursor()
+
+        query= "SELECT * FROM users WHERE username = %s"
+        cursor.execute(query,(username,))
+        result = cursor.fetchone()
+        
+        if result is not None:
+            session["username"] = username
+            session["password"] = password
+            return render_template("login_success.html")
+        
+        else:    
+            return redirect(url_for("create_account"))   
+
+    
 
 @app.route("/logout")
 def logout():
@@ -90,6 +133,8 @@ def process():
                 output = " | ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
+
+
 
 
 @app.route("/mood")
