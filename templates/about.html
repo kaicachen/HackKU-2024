@@ -33,7 +33,7 @@
           <a class="navbar-brand" href="{{ url_for('index') }}">
             <img src="static/images/logo.png" alt="" />
             <span>
-              Spering
+              Mind Mapper
             </span>
           </a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,11 +107,11 @@
               It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as
             </p>
             <div class="btn-box">
-              <a href="" class="btn-1">
-                Read More
+              <a href="{{ url_for('index') }}" class="btn-1">
+                Home
               </a>
-              <a href="" class="btn-2">
-                Hire
+              <a href="{{ url_for('calendar') }}" class="btn-2">
+                Calendar
               </a>
             </div>
           </div>
