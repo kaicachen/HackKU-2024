@@ -76,9 +76,9 @@ def process():
         cursor.close()
         
 
-        if date == today:
+        if date == str(today):
             if result1 is None or result2 is None:
-                return redirect(url_for("track.html"))
+                return render_template("track.html")
             else:
                 output = " | ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
@@ -117,6 +117,10 @@ def about():
 @app.route("/calendar")
 def calendar():
     return render_template("calendar.html")
+
+@app.route("/track")
+def track():
+    return "poopy"
     
 
 
