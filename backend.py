@@ -86,7 +86,7 @@ def process():
         else:
             if result1 is None or result2 is None:
                 return render_template("no_result.html")
-            else:
+            else:   
                 output = " | ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
