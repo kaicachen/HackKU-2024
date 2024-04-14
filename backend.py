@@ -77,15 +77,15 @@ def process():
         
 
         if date == today:
-            if results == ["NULL", "NULL"]:
+            if result1 is None or result2 is None:
                 return redirect(url_for("track.html"))
             else:
                 output = " | ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
         else:
-            if results == ["NULL", "NULL"]:
-                print("No entry for selected date")
+            if result1 is None or result2 is None:
+                return f'<p>No entry for selected date</p>'
             else:
                 output = " | ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
