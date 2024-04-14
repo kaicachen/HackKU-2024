@@ -122,7 +122,7 @@ def calendar():
     else:
         return render_template("calendar.html")
 
-@app.route("/track")
+@app.route("/track", methods=["POST"])
 def track():
     return "poopy"
     
