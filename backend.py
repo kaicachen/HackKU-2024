@@ -194,22 +194,40 @@ def plot():
     cursor = mysql.connection.cursor()
     
     username = session["username"]
-    cursor.execute("SELECT date, score FROM logs where username = %s")
+    cursor.execute("SELECT date, score FROM logs WHERE username = %s", (username,))
     rows = cursor.fetchall()
     cursor.close()
 
 	# Extract x and y values from the fetched data
-    dates = [row[0] for row in rows]
+    dates = [str(row[0]) for row in rows]
     scores = [row[1] for row in rows]
 
+    list_of_days = []
+    # ((2024, 1, 1), 7)
+    # 1, 11
+    for i in dates:
+        day = int(i[8:10])
 
-    nan_indices = np.isnan(scores)
+        list_of_days.append(day)
+
+
+    dates_yes = []
+    for i in range(0, 30):
+        dates_yes.append(np.nan)
+
+    for i in range(len(dates)):
+        dates_yes[list_of_days[i] - 1] = scores[i]
+
+
+    for i in dates_yes:
+        print(i)
+
+    nan_indices = np.isnan(dates_yes)
     not_nan_indices = ~nan_indices
 
+    #interpolated_scores = np.interp(np.arange(len(scores)), np.arange(len(scores))[not_nan_indices], scores[not_nan_indices])
     interpolated_scores = np.interp(np.flatnonzero(nan_indices), np.flatnonzero(not_nan_indices), scores[not_nan_indices])
 
-
-    scores[nan_indices]
 
     coefficients = np.polyfit(np.arange(len(dates))[not_nan_indices], scores[not_nan_indices], 1)
     trendline = np.polyval(coefficients, np.arange(len(dates)))
@@ -217,12 +235,13 @@ def plot():
 
     # Plot the graph
     plt.figure(figsize=(10, 5))
+    #plt.plot(dates, scores, marker='o', color='blue')
     plt.plot(dates[not_nan_indices], scores[not_nan_indices], marker='o', color='blue', label='Actual Scores')
     plt.plot(dates[nan_indices], interpolated_scores, marker='o', linestyle='None', color='red', label='Interpolated Scores')
     plt.plot(dates, trendline, linestyle='--', color='green', label='Trendline')
-    plt.title('Scores Over Days of January 2022')
+    plt.title('Scores over time')
     plt.xlabel('Date')
-    plt.ylabel('Mood score (out of 10)')
+    plt.ylabel('Mood (out of 10)')
     plt.xticks(rotation=45)
     plt.grid(True)
     plt.legend()
@@ -238,7 +257,6 @@ def plot():
     plt.clf()
 	# Return the image as a response
     return send_file(buffer, mimetype='image/png')
-
 
 
 if __name__ == '__main__':
