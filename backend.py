@@ -21,7 +21,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # SameSite policy for cookies
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Terabyter47m!'
+app.config['MYSQL_PASSWORD'] = 'TN9VVQ%YPHu45YLftak$'
 app.config['MYSQL_DB'] = 'mental_health'
 
 mysql = MySQL(app)
@@ -196,11 +196,17 @@ def plot():
         return redirect(url_for("login"))
     username = session["username"]
     cursor.execute("SELECT date, score FROM logs WHERE username = %s", (username,))
-    rows = cursor.fetchall()
-    cursor.close()
-    if rows is None:
+    row_check = cursor.fetchone()
+    
+    if row_check is None:
         return render_template("no_result.html")
+    
 
+    cursor.execute("SELECT date, score FROM logs WHERE username = %s", (username,))
+    rows = cursor.fetchall()
+
+    cursor.close()
+    
     # Extract dates and scores
     dates = [row[0] for row in rows]
     scores = [row[1] for row in rows]
