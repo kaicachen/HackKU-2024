@@ -91,20 +91,6 @@ def process():
                 string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
 
-@app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
-def add_mood(day):
-    if request.method == 'POST':
-        # Get mood data from the form and insert into the database
-        username = request.form.get["username"]
-
-        # Insert mood data into MySQL database
-        # Your MySQL insertion code here...
-
-        # You can return a JSON response or simply a success message if needed
-        return {'success': True}
-
-    return render_template('add_mood_popup.html', day=day)
-
 
 @app.route("/mood")
 def mood():
