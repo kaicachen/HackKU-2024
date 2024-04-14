@@ -1,6 +1,11 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, send_file
 from flask_mysqldb import MySQL
 from datetime import date
+
+import numpy as np
+import matplotlib.pyplot as plt
+import io
+import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = "hello"
@@ -16,7 +21,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # SameSite policy for cookies
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Terabyter47m!'
+app.config['MYSQL_PASSWORD'] = 'mmmHungwy?'
 app.config['MYSQL_DB'] = 'mental_health'
 
 mysql = MySQL(app)
@@ -118,6 +123,83 @@ def about():
 def calendar():
     return render_template("calendar.html")
     
+@app.route('/plot')
+def plot():
+	# Fetch data from MySQL
+    cursor = mysql.connection.cursor()
+    
+    username = session["username"]
+    cursor.execute("SELECT date, score FROM logs WHERE username = %s", (username,))
+    rows = cursor.fetchall()
+    cursor.close()
+
+	# Extract x and y values from the fetched data
+    dates = [str(row[0]) for row in rows]
+    scores = [row[1] for row in rows]
+
+    list_of_days = []
+    # ((2024, 1, 1), 7)
+    # 1, 11
+    for i in dates:
+        day = int(i[8:10])
+
+        list_of_days.append(day)
+
+
+    dates_yes = []
+    for i in range(0, 30):
+        dates_yes.append(np.nan)
+
+    for i in range(len(dates)):
+        dates_yes[list_of_days[i] - 1] = scores[i]
+
+            
+
+    
+
+    for i in dates_yes:
+        print(i)
+
+
+
+
+
+    nan_indices = np.isnan(dates_yes)
+    not_nan_indices = ~nan_indices
+
+    #interpolated_scores = np.interp(np.arange(len(scores)), np.arange(len(scores))[not_nan_indices], scores[not_nan_indices])
+    interpolated_scores = np.interp(np.flatnonzero(nan_indices), np.flatnonzero(not_nan_indices), scores[not_nan_indices])
+
+
+    coefficients = np.polyfit(np.arange(len(dates))[not_nan_indices], scores[not_nan_indices], 1)
+    trendline = np.polyval(coefficients, np.arange(len(dates)))
+
+
+    # Plot the graph
+    plt.figure(figsize=(10, 5))
+    #plt.plot(dates, scores, marker='o', color='blue')
+    plt.plot(dates[not_nan_indices], scores[not_nan_indices], marker='o', color='blue', label='Actual Scores')
+    plt.plot(dates[nan_indices], interpolated_scores, marker='o', linestyle='None', color='red', label='Interpolated Scores')
+    plt.plot(dates, trendline, linestyle='--', color='green', label='Trendline')
+    plt.title('Scores over time')
+    plt.xlabel('Date')
+    plt.ylabel('Mood (out of 10)')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+
+
+
+    # Save plot to a buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+	# Clear plot
+    plt.clf()
+	# Return the image as a response
+    return send_file(buffer, mimetype='image/png')
+
 
 
 if __name__ == '__main__':
