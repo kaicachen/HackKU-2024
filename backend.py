@@ -5,7 +5,7 @@ from datetime import date
 import numpy as np
 import matplotlib.pyplot as plt
 import io
-import mysql.connector
+# import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = "hello"
@@ -21,7 +21,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # SameSite policy for cookies
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'TN9VVQ%YPHu45YLftak$'
+app.config['MYSQL_PASSWORD'] = 'Terabyter47m!'
 app.config['MYSQL_DB'] = 'mental_health'
 
 mysql = MySQL(app)
@@ -105,6 +105,10 @@ def logout():
     session.pop("password", None)
     return redirect(url_for("index"))
 
+@app.route("/result_found")
+def result_found():
+    return render_template("result_found.html")
+
 @app.route("/process_form", methods = ["POST"])
 def process():
     if request.method == "POST":
@@ -171,13 +175,17 @@ def track():
         cursor.execute(query1, (username, date, score, note,))
         mysql.connection.commit()  # Commit changes to the database
         query2 = "SELECT score FROM logs WHERE username = %s AND date = %s"
+        query3 = "SELECT note FROM logs WHERE username = %s AND date = %s"
         cursor.execute(query2, (username, date,))
-        result = cursor.fetchone()
+        result1 = cursor.fetchone()
+        cursor.execute(query3, (username, date,))
+        result2 = cursor.fetchone()
         cursor.close()
-        results.append(result)
+        results.append(result1)
+        results.append(result2)
         output = " | ".join(str(element) for sublist in results for element in sublist)
         string_date = str(date)
-        return f'<p>{string_date}: {output}</p>'
+        return render_template("result_found.html", output=output)
     
 @app.route('/plot')
 def plot():

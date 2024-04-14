@@ -58,12 +58,6 @@
                   Login
                 </span>
               </a>
-              <div style="margin-right: 20px;"></div>
-                <a href="{{ url_for('create_account') }}">
-                  <span>
-                    Create Account
-                  </span>
-                </a>
               <form class="form-inline my-2 my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
                 <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit"></button>
               </form>
@@ -106,12 +100,13 @@
           <div class="detail-box">
             <div class="heading_container">
               <h2>
-                What is Mind Mapper?
+                Entry:
               </h2>
             </div>
             <p>
-              Mind Mapper is a project dedicated to empowering individuals to take control of their mental health using easy data tracking and visualization.
-            </p>
+                <!-- Display dynamic data here -->
+                <p>{{ output }}</p>
+              </p>
             <div class="btn-box">
               <a href="{{ url_for('index') }}" class="btn-1">
                 Home
