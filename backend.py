@@ -205,7 +205,7 @@ def plot():
     dates_str = [str(date) for date in dates]
 
     # Generate a list of days in the month
-    days_in_month = 30  # Assuming a month with 30 days
+    days_in_month = 31  # Assuming a month with 30 days
     list_of_days = np.arange(1, days_in_month + 1)
 
     # Initialize an array to hold scores for each day
