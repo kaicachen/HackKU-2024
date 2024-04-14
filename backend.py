@@ -116,7 +116,11 @@ def about():
 
 @app.route("/calendar")
 def calendar():
-    return render_template("calendar.html")
+    if session.get("username") is None:
+        return redirect(url_for("login"))
+        
+    else:
+        return render_template("calendar.html")
 
 @app.route("/track")
 def track():
