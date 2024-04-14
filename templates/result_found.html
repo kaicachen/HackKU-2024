@@ -100,12 +100,12 @@
           <div class="detail-box">
             <div class="heading_container">
               <h2>
-                Entry:
+                {{ date }}:
               </h2>
             </div>
             <p>
                 <!-- Display dynamic data here -->
-                <p>{{ output }}</p>
+                <p>Score: {{ output }}</p>
               </p>
             <div class="btn-box">
               <a href="{{ url_for('index') }}" class="btn-1">

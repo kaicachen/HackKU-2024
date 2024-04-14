@@ -105,9 +105,6 @@ def logout():
     session.pop("password", None)
     return redirect(url_for("index"))
 
-@app.route("/result_found")
-def result_found():
-    return render_template("result_found.html")
 
 @app.route("/process_form", methods = ["POST"])
 def process():
@@ -132,16 +129,16 @@ def process():
             if result1 is None or result2 is None:
                 return render_template("track.html")
             else:
-                output = " | ".join(str(element) for sublist in results for element in sublist)
+                output = " - ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
-                return f'<p>{string_date}: {output}</p>'
+                return render_template("result_found.html", output=output, date=string_date)
         else:
             if result1 is None or result2 is None:
                 return render_template("no_result.html")
             else:   
-                output = " | ".join(str(element) for sublist in results for element in sublist)
+                output = " - ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
-                return f'<p>{string_date}: {output}</p>'
+                return render_template("result_found.html", output=output, date=string_date)
 
 
 
@@ -183,9 +180,9 @@ def track():
         cursor.close()
         results.append(result1)
         results.append(result2)
-        output = " | ".join(str(element) for sublist in results for element in sublist)
+        output = " - ".join(str(element) for sublist in results for element in sublist)
         string_date = str(date)
-        return render_template("result_found.html", output=output)
+        return render_template("result_found.html", output=output, date=string_date)
     
 @app.route('/plot')
 def plot():
