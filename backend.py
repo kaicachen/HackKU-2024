@@ -190,7 +190,7 @@ def track():
     
 @app.route('/plot')
 def plot():
-	# Fetch data from MySQL
+    # Fetch data from MySQL
     cursor = mysql.connection.cursor()
     
     username = session["username"]
@@ -198,40 +198,30 @@ def plot():
     rows = cursor.fetchall()
     cursor.close()
 
-	# Extract x and y values from the fetched data
+    # Extract x and y values from the fetched data
     dates = [str(row[0]) for row in rows]
     scores = [row[1] for row in rows]
 
     list_of_days = []
-    # ((2024, 1, 1), 7)
-    # 1, 11
     for i in dates:
         day = int(i[8:10])
-
         list_of_days.append(day)
 
-
     dates_yes = []
-    for i in range(0, 30):
+    for i in range(0, 31):  # Changed length to 31
         dates_yes.append(np.nan)
 
     for i in range(len(dates)):
         dates_yes[list_of_days[i] - 1] = scores[i]
 
-
-    for i in dates_yes:
-        print(i)
-
     nan_indices = np.isnan(dates_yes)
     not_nan_indices = ~nan_indices
 
-    #interpolated_scores = np.interp(np.arange(len(scores)), np.arange(len(scores))[not_nan_indices], scores[not_nan_indices])
-    interpolated_scores = np.interp(np.flatnonzero(nan_indices), np.flatnonzero(not_nan_indices), scores[not_nan_indices])
+    interpolated_scores = np.interp(np.flatnonzero(not_nan_indices), np.flatnonzero(not_nan_indices), dates_yes[not_nan_indices])
+    # Change the above line to use 'dates_yes' instead of 'scores' since we're interpolating 'dates_yes'
 
-
-    coefficients = np.polyfit(np.arange(len(dates))[not_nan_indices], scores[not_nan_indices], 1)
+    coefficients = np.polyfit(np.arange(len(dates))[not_nan_indices], dates_yes[not_nan_indices], 1)
     trendline = np.polyval(coefficients, np.arange(len(dates)))
-
 
     # Plot the graph
     plt.figure(figsize=(10, 5))
@@ -246,8 +236,6 @@ def plot():
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-
-
 
     # Save plot to a buffer
     buffer = io.BytesIO()
