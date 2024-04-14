@@ -126,19 +126,19 @@ def calendar():
 def track():
     if request.method == "POST":
         username = session["username"]
-        score = request.form.get("mood_score")
+        score = int(request.form.get("mood_score"))
         note = request.form.get("note")
-        date = request.form.get("date")
+        date = str(today)
         results = []
         cursor = mysql.connection.cursor()
-        query1 = "INSERT INTO logs (username, date, score, note) VALUES ()"
-        cursor.execute(query1,(username,date,score,note,))
+        query1 = "INSERT INTO logs (username, date, score, note) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query1, (username, date, score, note,))
+        mysql.connection.commit()  # Commit changes to the database
         query2 = "SELECT score FROM logs WHERE username = %s AND date = %s"
-        query3 = "SELECT score FROM logs WHERE username = %s AND date = %s"
+        cursor.execute(query2, (username, date,))
         result = cursor.fetchone()
         cursor.close()
-        results.append(query2)
-        results.append(query3)
+        results.append(result)
         output = " | ".join(str(element) for sublist in results for element in sublist)
         string_date = str(date)
         return f'<p>{string_date}: {output}</p>'
