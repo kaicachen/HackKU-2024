@@ -1,6 +1,11 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, send_file
 from flask_mysqldb import MySQL
 from datetime import date
+
+import numpy as np
+import matplotlib.pyplot as plt
+import io
+import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = "hello"
@@ -118,6 +123,57 @@ def about():
 def calendar():
     return render_template("calendar.html")
     
+@app.route('/plot')
+def plot():
+	# Fetch data from MySQL
+    cursor = mysql.connection.cursor()
+    
+    username = session["username"]
+    cursor.execute("SELECT date, score FROM logs where username = %s")
+    rows = cursor.fetchall()
+    cursor.close()
+
+	# Extract x and y values from the fetched data
+    dates = [row[0] for row in rows]
+    scores = [row[1] for row in rows]
+
+
+    nan_indices = np.isnan(scores)
+    not_nan_indices = ~nan_indices
+
+    interpolated_scores = np.interp(np.flatnonzero(nan_indices), np.flatnonzero(not_nan_indices), scores[not_nan_indices])
+
+
+    scores[nan_indices]
+
+    coefficients = np.polyfit(np.arange(len(dates))[not_nan_indices], scores[not_nan_indices], 1)
+    trendline = np.polyval(coefficients, np.arange(len(dates)))
+
+
+    # Plot the graph
+    plt.figure(figsize=(10, 5))
+    plt.plot(dates[not_nan_indices], scores[not_nan_indices], marker='o', color='blue', label='Actual Scores')
+    plt.plot(dates[nan_indices], interpolated_scores, marker='o', linestyle='None', color='red', label='Interpolated Scores')
+    plt.plot(dates, trendline, linestyle='--', color='green', label='Trendline')
+    plt.title('Scores Over Days of January 2022')
+    plt.xlabel('Date')
+    plt.ylabel('Mood score (out of 10)')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+
+
+
+    # Save plot to a buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+	# Clear plot
+    plt.clf()
+	# Return the image as a response
+    return send_file(buffer, mimetype='image/png')
+
 
 
 if __name__ == '__main__':
