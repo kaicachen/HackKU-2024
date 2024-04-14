@@ -81,9 +81,9 @@ def process():
         cursor.close()
         
 
-        if date == today:
+        if date == str(today):
             if result1 is None or result2 is None:
-                return redirect(url_for("track.html"))
+                return render_template("track.html")
             else:
                 output = " | ".join(str(element) for sublist in results for element in sublist)
                 string_date = str(date)
@@ -96,20 +96,6 @@ def process():
                 string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
 
-@app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
-def add_mood(day):
-    if request.method == 'POST':
-        # Get mood data from the form and insert into the database
-        username = request.form.get["username"]
-
-        # Insert mood data into MySQL database
-        # Your MySQL insertion code here...
-
-        # You can return a JSON response or simply a success message if needed
-        return {'success': True}
-
-    return render_template('add_mood_popup.html', day=day)
-
 
 @app.route("/mood")
 def mood():
@@ -121,7 +107,32 @@ def about():
 
 @app.route("/calendar")
 def calendar():
-    return render_template("calendar.html")
+    if session.get("username") is None:
+        return redirect(url_for("login"))
+        
+    else:
+        return render_template("calendar.html")
+
+@app.route("/track", methods=["POST"])
+def track():
+    if request.method == "POST":
+        username = session["username"]
+        score = int(request.form.get("mood_score"))
+        note = request.form.get("note")
+        date = str(today)
+        results = []
+        cursor = mysql.connection.cursor()
+        query1 = "INSERT INTO logs (username, date, score, note) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query1, (username, date, score, note,))
+        mysql.connection.commit()  # Commit changes to the database
+        query2 = "SELECT score FROM logs WHERE username = %s AND date = %s"
+        cursor.execute(query2, (username, date,))
+        result = cursor.fetchone()
+        cursor.close()
+        results.append(result)
+        output = " | ".join(str(element) for sublist in results for element in sublist)
+        string_date = str(date)
+        return f'<p>{string_date}: {output}</p>'
     
 @app.route('/plot')
 def plot():
