@@ -56,10 +56,6 @@ def logout():
     session.pop("username", None)
     session.pop("password", None)
     return redirect(url_for("index"))
-    
-@app.route("/mood_track")
-def mood_track():
-    return redirect(url_for("track.html"))
 
 @app.route("/process_form", methods = ["POST"])
 def process():
@@ -78,19 +74,21 @@ def process():
         results.append(result1)
         results.append(result2)
         cursor.close()
-        output = " | ".join(str(element) for sublist in results for element in sublist)
-
-        string_date = str(date)
+        
 
         if date == today:
             if results == ["NULL", "NULL"]:
                 return redirect(url_for("track.html"))
             else:
+                output = " | ".join(str(element) for sublist in results for element in sublist)
+                string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
         else:
             if results == ["NULL", "NULL"]:
                 print("No entry for selected date")
             else:
+                output = " | ".join(str(element) for sublist in results for element in sublist)
+                string_date = str(date)
                 return f'<p>{string_date}: {output}</p>'
 
 @app.route('/add_mood/<int:day>', methods=['GET', 'POST'])
