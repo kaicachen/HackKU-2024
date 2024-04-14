@@ -125,79 +125,59 @@ def calendar():
     
 @app.route('/plot')
 def plot():
-	# Fetch data from MySQL
+    # Fetch data from MySQL
     cursor = mysql.connection.cursor()
-    
     username = session["username"]
     cursor.execute("SELECT date, score FROM logs WHERE username = %s", (username,))
     rows = cursor.fetchall()
     cursor.close()
 
-	# Extract x and y values from the fetched data
-    dates = [str(row[0]) for row in rows]
+    # Extract dates and scores
+    dates = [row[0] for row in rows]
     scores = [row[1] for row in rows]
 
-    list_of_days = []
-    # ((2024, 1, 1), 7)
-    # 1, 11
-    for i in dates:
-        day = int(i[8:10])
+    # Convert dates to string format
+    dates_str = [str(date) for date in dates]
 
-        list_of_days.append(day)
+    # Generate a list of days in the month
+    days_in_month = 30  # Assuming a month with 30 days
+    list_of_days = np.arange(1, days_in_month + 1)
 
+    # Initialize an array to hold scores for each day
+    scores_by_day = np.full(days_in_month, np.nan)
 
-    dates_yes = []
-    for i in range(0, 30):
-        dates_yes.append(np.nan)
+    # Populate the array with scores
+    for date, score in zip(dates, scores):
+        day = date.day
+        scores_by_day[day - 1] = score
 
-    for i in range(len(dates)):
-        dates_yes[list_of_days[i] - 1] = scores[i]
-
-            
-
-    
-
-    for i in dates_yes:
-        print(i)
-
-
-
-
-
-    nan_indices = np.isnan(dates_yes)
+    # Interpolate missing scores
+    nan_indices = np.isnan(scores_by_day)
     not_nan_indices = ~nan_indices
-
-    #interpolated_scores = np.interp(np.arange(len(scores)), np.arange(len(scores))[not_nan_indices], scores[not_nan_indices])
-    interpolated_scores = np.interp(np.flatnonzero(nan_indices), np.flatnonzero(not_nan_indices), scores[not_nan_indices])
-
-
-    coefficients = np.polyfit(np.arange(len(dates))[not_nan_indices], scores[not_nan_indices], 1)
-    trendline = np.polyval(coefficients, np.arange(len(dates)))
-
+    interpolated_scores = np.interp(np.arange(days_in_month), np.arange(days_in_month)[not_nan_indices], scores_by_day[not_nan_indices])
 
     # Plot the graph
     plt.figure(figsize=(10, 5))
-    #plt.plot(dates, scores, marker='o', color='blue')
-    plt.plot(dates[not_nan_indices], scores[not_nan_indices], marker='o', color='blue', label='Actual Scores')
-    plt.plot(dates[nan_indices], interpolated_scores, marker='o', linestyle='None', color='red', label='Interpolated Scores')
-    plt.plot(dates, trendline, linestyle='--', color='green', label='Trendline')
-    plt.title('Scores over time')
-    plt.xlabel('Date')
+    
+    plt.plot(list_of_days[not_nan_indices], scores_by_day[not_nan_indices], marker='o', color='blue', label='Entered day')
+    plt.plot(list_of_days[nan_indices], interpolated_scores[nan_indices], marker='o', linestyle='None', color='red', label='Not entered')
+    plt.title('Scores Over Days of the Month')
+    plt.xlabel('Day')
     plt.ylabel('Mood (out of 10)')
-    plt.xticks(rotation=45)
+    plt.xticks(list_of_days)
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-
-
 
     # Save plot to a buffer
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     buffer.seek(0)
-	# Clear plot
+    
+    # Clear plot
     plt.clf()
-	# Return the image as a response
+
+    # Return the image as a response
     return send_file(buffer, mimetype='image/png')
 
 
